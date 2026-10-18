@@ -4,3 +4,4 @@
 .config/kitty/matugen.conf
 .config/rofi/colors.rasi
 .config/quickshell/state/
+.config/hypr/matugen-colors.lua

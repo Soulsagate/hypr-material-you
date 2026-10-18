@@ -20,3 +20,7 @@ output = "~/.config/gtk-4.0/colors.css"
 [quickshell]
 input  = "~/.config/43pr/templates/quickshell-theme.json"
 output = "~/.cache/43pr/quickshell-theme.json"
+[hypr]
+input  = "~/.config/43pr/templates/hypr-colors.lua"
+output = "~/.config/hypr/matugen-colors.lua"
+reload = ["hyprctl", "reload", "config-only"]
