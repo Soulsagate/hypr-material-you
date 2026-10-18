@@ -117,7 +117,7 @@ Works for Arch, CachyOS, EndeavourOS, Manjaro, etc. Mainly intended for a clean 
 
 ```bash
 sudo pacman -S git
-git clone <URL of this repository> dotfiles
+git clone https://github.com/Soulsagate/hypr-material-you.git dotfiles
 cd dotfiles
 chmod +x install.sh
 ./install.sh
