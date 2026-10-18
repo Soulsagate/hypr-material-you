@@ -12,7 +12,7 @@ A polished, wallpaper-driven **Material-You** Hyprland desktop: capsule-pill Qui
 
 </div>
 
-> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). That visual layer doesn't modify keybinds, window rules, workspaces or monitor config; a few of those already differ from upstream, listed under [Keybinds](#keybinds). See [Credits](#credits--license).
+> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). Beyond that visual layer, the fork made only two keybind-related changes (the `Super + R` recorder fix and the `Super + /` cheat sheet); window rules, workspaces and monitor config are untouched. A few settings already differed from upstream before the fork; both lists are under [Keybinds](#keybinds). See [Credits](#credits--license).
 
 ## Screenshots
 
@@ -54,6 +54,9 @@ All colors above were generated from the wallpaper. Change the wallpaper and eve
 - **`set-wallpaper.sh`** (`.config/43pr/bin/`) — `set-wallpaper.sh [image]` sets the wallpaper on all outputs with `awww`, then runs `theme.py wallpaper` to regenerate colors and reload everything. No argument picks a random image from `~/Pictures/Wallpapers`. It isn't bound to a key; bind it yourself if you want one.
 - **Notification fix** — mako ships a D-Bus activation file, so a notification sent while quickshell was restarting would auto-start mako, which then kept `org.freedesktop.Notifications` and blocked quickshell's built-in server. `install.sh` now masks `mako.service`. Popups also stay at least 8 seconds (max 15), and icons resolve from theme names, absolute paths, `file://` URLs, image hints, or the app's desktop entry.
 - **Fonts** — JetBrainsMono Nerd Font is the monospace font (bar, rofi, kitty). GTK apps stay on Adwaita Sans.
+- **Screen recorder fix** — `Super + R` was hard-coded to record `HDMI-A-1`, so it failed on any machine without that output. It now asks Hyprland for the focused monitor each time it's pressed (falling back to `screen`). `gpu-screen-recorder` is now listed in `packages.txt`, since the keybind needs it.
+- **Keybind cheat sheet** — `Super + /` opens `.config/hypr/keys.txt` in rofi: every keybind grouped by apps, windows, workspaces, look, screenshots/recording, input and session, plus a few terminal commands this setup provides.
+- **Spicetify Marketplace** — updated the bundled Marketplace custom app to the official v1.0.11 release.
 
 ## How the matugen pipeline works
 
@@ -87,12 +90,14 @@ theme.py status                 # current mode / preset / wallpaper
 
 > **You can modify keybinds using HyprMod.** Press `Super + /` for a cheat sheet of everything below.
 >
-> This fork's visual layer doesn't touch keybinds, rules or monitors, but this setup already differs from upstream 43PR in a few places:
+> **Changed by this fork:**
+> - `Super + R` records the focused monitor instead of a hard-coded `HDMI-A-1` (needs `gpu-screen-recorder`);
+> - added the `Super + /` cheat sheet, `.config/hypr/keys.txt` (the binding was already in this setup, but the file was never committed, so it opened an empty menu on a fresh clone).
+>
+> **Already differed from upstream 43PR before the fork:**
 > - power menu on `Super + Escape` (upstream: `Super + Grave`);
 > - light/dark toggle on `Super + Shift + T` (upstream: `Super + L`);
 > - screenshots on `Super + Delete` and `Super + Shift + S` (upstream: `Delete` and `Shift + Delete`);
-> - added `Super + /` (keybind cheat sheet, `.config/hypr/keys.txt`);
-> - `Super + R` records the focused monitor instead of a hard-coded `HDMI-A-1`;
 > - a custom `monitors.lua` for this machine's three monitors;
 > - `rules.lua`: fullscreen windows use `opacity = "0.9 override"` (upstream: `1.0`).
 
@@ -118,6 +123,14 @@ theme.py status                 # current mode / preset / wallpaper
 | `Super + Mouse wheel`   | Zoom in/out               |
 | `Super + C`             | Notes/To-do               |
 | `Super + N`             | Notifications             |
+| `Super + H / J / K / L` | Focus left/down/up/right  |
+| `Super + Shift + H/J/K/L`| Move window              |
+| `Super + Ctrl + H/J/K/L`| Resize window             |
+| `Super + Shift + T`     | Light/dark theme toggle   |
+| `Super + X`             | Next keyboard layout      |
+| `Super + R`             | Start/stop screen recording (focused monitor) |
+| `Super + /`             | Keybind cheat sheet       |
+| `Super + Shift + E`     | Quit Hyprland (no confirm)|
 | `Super + Delete`        | Screenshot fullscreen     |
 | `Super + Shift + S`     | Screenshot area select    |
 
