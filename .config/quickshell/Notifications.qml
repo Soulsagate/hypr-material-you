@@ -62,6 +62,7 @@ PanelWindow {
             anchors.fill: parent
             fillMode: Image.PreserveAspectCrop
             asynchronous: true
+            sourceSize: Qt.size(128, 128)
             source: parent.src
         }
         Text {
@@ -135,9 +136,19 @@ PanelWindow {
 
     function px(n) { return Math.round(n * ui); }
     function imgSrc(p) { return !p ? "" : (p.startsWith("/") ? "file://" + p : p); }
-    function thumbSrc(image, icon) {
+    function thumbSrc(image, icon, app) {
         if (image && image !== "") return imgSrc(image);
-        if (icon && icon !== "") return Quickshell.iconPath(icon, true);
+        if (icon && icon !== "") {
+            if (icon.startsWith("file://") || icon.startsWith("image://")) return icon;
+            if (icon.startsWith("/")) return "file://" + icon;
+            const p = Quickshell.iconPath(icon, true);
+            if (p !== "") return p;
+        }
+        const e = app ? (DesktopEntries.heuristicLookup(app) ?? DesktopEntries.heuristicLookup(app.toLowerCase())) : null;
+        if (e && e.icon) {
+            const p = Quickshell.iconPath(e.icon, true);
+            if (p !== "") return p;
+        }
         return "";
     }
     function fmtTime(ms) {
@@ -363,7 +374,8 @@ PanelWindow {
                 }
 
                 Timer {
-                    interval: wrapper.modelData.expireTimeout > 0 ? Math.min(wrapper.modelData.expireTimeout > 100 ? wrapper.modelData.expireTimeout : wrapper.modelData.expireTimeout * 1000, 10000) : 6000
+                    // apps often ask for 3-5s; keep every popup up for at least 8s (max 15s)
+                    interval: Math.max(8000, Math.min(wrapper.modelData.expireTimeout > 100 ? wrapper.modelData.expireTimeout : wrapper.modelData.expireTimeout * 1000, 15000))
                     running: !wrapper.critical && !hover.containsMouse && !wrapper.leaving
                     onTriggered: wrapper.close(true)
                 }
@@ -400,7 +412,7 @@ PanelWindow {
                             id: thumb
                             ui: root.ui
                             color: Theme.bg
-                            src: root.thumbSrc(wrapper.modelData.image, wrapper.modelData.appIcon)
+                            src: root.thumbSrc(wrapper.modelData.image, wrapper.modelData.appIcon, wrapper.modelData.desktopEntry || wrapper.modelData.appName)
                             anchors.verticalCenter: parent.verticalCenter
                         }
 
@@ -631,7 +643,7 @@ PanelWindow {
                         ui: root.ui
                         size: 32
                         color: Theme.alpha(Theme.text, 0.1)
-                        src: root.thumbSrc(entry.image, entry.appIcon)
+                        src: root.thumbSrc(entry.image, entry.appIcon, entry.appName)
                         anchors { left: parent.left; leftMargin: root.px(10); verticalCenter: parent.verticalCenter }
                     }
 
