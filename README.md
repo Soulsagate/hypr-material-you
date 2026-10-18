@@ -12,7 +12,7 @@ A polished, wallpaper-driven **Material-You** Hyprland desktop: capsule-pill Qui
 
 </div>
 
-> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). Keybinds, window rules, workspaces and monitor config are unchanged from the base. See [Credits](#credits--license).
+> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). That visual layer doesn't modify keybinds, window rules, workspaces or monitor config; a few of those already differ from upstream, listed under [Keybinds](#keybinds). See [Credits](#credits--license).
 
 ## Screenshots
 
@@ -73,7 +73,8 @@ wallpaper ──► matugen image ──► semantic palette ──► render te
 Useful commands:
 
 ```bash
-theme.py colorgen on            # wallpaper-driven colors ON (off by default)
+theme.py colorgen off           # stop wallpaper changes from re-theming (colors are ON by default)
+theme.py colorgen on            # turn wallpaper-driven colors back on
 theme.py wallpaper <image>      # regenerate from a wallpaper
 theme.py preset nord            # use a preset theme instead (also: tokyo-night, dracula, ...)
 theme.py status                 # current mode / preset / wallpaper
@@ -84,7 +85,16 @@ theme.py status                 # current mode / preset / wallpaper
 
 ## Keybinds
 
-> Unchanged from the base setup. **You can modify keybinds using HyprMod**
+> **You can modify keybinds using HyprMod.** Press `Super + /` for a cheat sheet of everything below.
+>
+> This fork's visual layer doesn't touch keybinds, rules or monitors, but this setup already differs from upstream 43PR in a few places:
+> - power menu on `Super + Escape` (upstream: `Super + Grave`);
+> - light/dark toggle on `Super + Shift + T` (upstream: `Super + L`);
+> - screenshots on `Super + Delete` and `Super + Shift + S` (upstream: `Delete` and `Shift + Delete`);
+> - added `Super + /` (keybind cheat sheet, `.config/hypr/keys.txt`);
+> - `Super + R` records the focused monitor instead of a hard-coded `HDMI-A-1`;
+> - a custom `monitors.lua` for this machine's three monitors;
+> - `rules.lua`: fullscreen windows use `opacity = "0.9 override"` (upstream: `1.0`).
 
 | Keybind                 | Action                    |
 | -----------             | ------------------------- |
@@ -131,7 +141,7 @@ chmod +x install.sh
 Then log out and back in. The installer also masks `mako.service` so quickshell owns notifications.
 
 1. **Wallpapers** — the desktop starts empty. Put images in `~/Pictures/Wallpapers` and open the wallpaper picker with `Super + W`.
-2. **Turn on wallpaper colors** — `theme.py colorgen on` (it is off by default), then pick a wallpaper. Or use a preset with `theme.py preset <name>`.
+2. **Wallpaper colors** — on by default: pick a wallpaper and everything re-themes. To keep the current colors when you change wallpapers, run `theme.py colorgen off` (`colorgen on` re-enables it). Or use a preset with `theme.py preset <name>`.
 3. **Hardware-specific config** — `.config/hypr/monitors.lua` is for a 3-monitor setup (two landscape, one rotated) and some GPU/driver bits are Nvidia-specific. Edit these for your machine before first login.
 
 > [!important]
