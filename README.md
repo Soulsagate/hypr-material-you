@@ -1,48 +1,85 @@
 <div align="center">
 
-## Hyprland Setup by 43pr メ
+## Hyprland · Material-You Rice
 
-A clean and simple Hyprland setup focused on practical keybinds, productivity, and easy to customize.
+A polished, wallpaper-driven **Material-You** Hyprland desktop: capsule-pill Quickshell bar, a clean Rofi launcher, matugen colors everywhere, blur and smooth animations.
 
 ![Hyprland](https://img.shields.io/badge/Hyprland-0.56.2-8b9aaf?style=for-the-badge&labelColor=101418)
-![GitHub repo size](https://img.shields.io/github/repo-size/43PR/dotfiles?style=for-the-badge&labelColor=101418&color=8b9aaf)
-[![Discord](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fdiscord.com%2Fapi%2Finvites%2FHQwU9SzHj%3Fwith_counts%3Dtrue&query=%24.approximate_member_count&style=for-the-badge&logo=discord&logoColor=ffffff&label=discord&labelColor=101418&color=7289a8)](https://discord.gg/HQwU9SzHj)
-[![YouTube](https://img.shields.io/badge/youtube-subscribe-b05a63?style=for-the-badge&logo=youtube&logoColor=ffffff&labelColor=101418)](https://www.youtube.com/@43PR2)
-[![Ko-Fi donate](https://img.shields.io/badge/donate-kofi?style=for-the-badge&logo=ko-fi&logoColor=ffffff&label=ko-fi&labelColor=101418&color=9a6570)](https://ko-fi.com/43pr)
+![Quickshell](https://img.shields.io/badge/Quickshell-0.3.2-bec2ff?style=for-the-badge&labelColor=101418)
+![Matugen](https://img.shields.io/badge/Matugen-Material%20You-c5c4dd?style=for-the-badge&labelColor=101418)
 
-### **[Features](#features)  -  [Keybinds](#keybinds)  -  [Installation](#installation) -  [Updating](#updating)**
+**[Screenshots](#screenshots)  -  [What's new](#whats-new-in-this-fork)  -  [Matugen pipeline](#how-the-matugen-pipeline-works)  -  [Keybinds](#keybinds)  -  [Installation](#installation)  -  [Credits](#credits--license)**
 
 </div>
 
-<img width="1920" height="1080" alt="v1 2 0" src="https://github.com/user-attachments/assets/3b4857bc-285a-473a-924c-be89dab714b9" />
+> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). Keybinds, window rules, workspaces and monitor config are unchanged from the base. See [Credits](#credits--license).
 
-<img width="1920" height="1080" alt="2" src="https://github.com/user-attachments/assets/49dd4dd2-7d4b-450b-8907-73280cfc8b6c" />
+## Screenshots
 
-Wallpapers: https://wallhaven.cc/user/43pr
+**Capsule bar** — workspaces + stats, taskbar, clock, and the two right-hand pills:
 
-## Features
+![Bar](docs/screenshots/bar.png)
 
-- **Top bar** - Customizing options, vertical bar, styles, calendar, controls for volume and media playback.
-- **Settings Menu** — System, network, bluetooth, display, audio, storage, themes, and more.
-- **Wallpaper picker & Dynamic Colors** — Custom wallpaper selector with automatic wallpaper-based color generation.
-- **Preset Themes** — Default Monochrome, Nord, Tokyo Night, etc, and easily create your own. 
-- **App Launcher** — **Rofi** Application search, clipboard history, and opacity control.
-- **Zsh + Starship** — Customizable shell with autosuggestions and history.
-- **Customizable Power Menu** —  Custom power menu. 
-- **Notes / To do** —  Custom quick Notes/To-do. 
-- **Hyprlock** — Custom lock screen.
-- **Spotify + Spicetify** — Custom theme based on **text - darkthemer**, (modified).
-- **Custom Scripts** — Scripts for workflow and system management.
+**Windows** — rounded corners, 1px matugen gradient border, gaps, shadow, blur:
 
-> All programs: [packages.txt](packages.txt)
+![Desktop](docs/screenshots/desktop.png)
 
-### Wallpaper Selector
+**Rofi** — rounded launcher with icons, descriptions and one highlighted row, blurred over the windows behind it:
 
-Just made some tweaks to it. Give it some love: [hyprquickpaper](https://github.com/iamsurjog/hyprquickpaper)
+![Rofi](docs/screenshots/rofi.png)
+
+All colors above were generated from the wallpaper. Change the wallpaper and everything re-themes.
+
+## What's new in this fork
+
+### Visuals
+
+- **Capsule pills** — the floating bar's panels are true capsules (`radius = min(width, height) / 2`) with an accent-tinted, semi-transparent background and a 1px accent hairline border. The existing bar-opacity slider still scales them. The `joined` and `strip` bar styles are unchanged.
+- **Right-pill split** — the right side of a horizontal bar is two pills instead of one: *media · volume · battery · net* and *notifications · wallpapers · settings · power*. It splits by module id, so the drag-to-reorder settings still work. Vertical bars keep a single panel.
+- **Taskbar module** — a new bar module (`Taskbar` in the bar settings, on by default) in its own pill next to the workspaces:
+  - one icon per open window, live from quickshell's `Hyprland.toplevels`, using each app's real icon from its desktop entry (glyph fallback when none resolves);
+  - the focused window is highlighted;
+  - click focuses the window and jumps to its workspace;
+  - hover shows `<app name> · workspace <n>`.
+- **Rofi theme** — rounded 24px window, capsule search bar, 36px icons, app descriptions under each name, a single highlighted row, JetBrainsMono Nerd Font. It reads the generated `colors.rasi`, so it follows the wallpaper.
+- **Hyprland look** (`.config/hypr/look.lua`) — 1px gradient border from the matugen accent, rounding 14, gaps 6 in / 12 out, blur (size 8, 3 passes, noise), soft shadow, and Material-3 style animations (`md3_decel` / `md3_accel` curves, popin windows, layer animations for rofi and bar popups).
+
+### Tools and fixes
+
+- **`set-wallpaper.sh`** (`.config/43pr/bin/`) — `set-wallpaper.sh [image]` sets the wallpaper on all outputs with `awww`, then runs `theme.py wallpaper` to regenerate colors and reload everything. No argument picks a random image from `~/Pictures/Wallpapers`. It isn't bound to a key; bind it yourself if you want one.
+- **Notification fix** — mako ships a D-Bus activation file, so a notification sent while quickshell was restarting would auto-start mako, which then kept `org.freedesktop.Notifications` and blocked quickshell's built-in server. `install.sh` now masks `mako.service`. Popups also stay at least 8 seconds (max 15), and icons resolve from theme names, absolute paths, `file://` URLs, image hints, or the app's desktop entry.
+- **Fonts** — JetBrainsMono Nerd Font is the monospace font (bar, rofi, kitty). GTK apps stay on Adwaita Sans.
+
+## How the matugen pipeline works
+
+One script, `.config/43pr/bin/theme.py`, turns a wallpaper into colors for every app.
+
+```
+wallpaper ──► matugen image ──► semantic palette ──► render templates ──► write files ──► reload apps
+              (config.toml +     (~/.cache/43pr/      (targets.toml)       (per target)    (reload hooks)
+               semantic.json)     palette.json)
+```
+
+1. `theme.py wallpaper <image>` runs `matugen image` with `.config/matugen/config.toml`. Its template, `.config/matugen/templates/semantic.json`, maps Material-You roles (`primary`, `surface_container`, `outline_variant`, …) to this setup's semantic names (`accent`, `bg_panel`, `border`, …).
+2. `.config/43pr/targets.toml` lists each output: an input template under `.config/43pr/templates/` and an output file. Templates use `{{name}}` tokens with filters such as `|alpha=70` or `|hex8=ff`.
+3. Targets: kitty, rofi (`colors.rasi`), hyprlock, GTK 3/4, the quickshell theme JSON (bar, notifications, settings), and Hyprland (`hypr/matugen-colors.lua`, read by `look.lua` for the border and shadow, with a fixed fallback if missing).
+4. All targets are rendered first and written only if every one succeeds, then reload hooks run (kitty reloads its colors; Hyprland runs `hyprctl reload config-only`).
+
+Useful commands:
+
+```bash
+theme.py colorgen on            # wallpaper-driven colors ON (off by default)
+theme.py wallpaper <image>      # regenerate from a wallpaper
+theme.py preset nord            # use a preset theme instead (also: tokyo-night, dracula, ...)
+theme.py status                 # current mode / preset / wallpaper
+.config/43pr/bin/set-wallpaper.sh [image]   # set wallpaper + regenerate in one go
+```
+
+`theme.py` lives at `~/.config/43pr/bin/theme.py` after install. Generated files (`rofi/colors.rasi`, `hypr/matugen-colors.lua`, GTK/kitty/hyprlock colors) are gitignored.
 
 ## Keybinds
 
-> **You can modify keybinds using HyprMod**
+> Unchanged from the base setup. **You can modify keybinds using HyprMod**
 
 | Keybind                 | Action                    |
 | -----------             | ------------------------- |
@@ -69,55 +106,36 @@ Just made some tweaks to it. Give it some love: [hyprquickpaper](https://github.
 | `Delete`                | Screenshot fullscreen     |
 | `SHIFT + Delete`        | Screenshot area select    |
 
-> [!note]
->
 > **Move and resize windows with Super + left/right mouse drag.**
 >
 > All keybinds: [.config/hypr/keybinds.lua](.config/hypr/keybinds.lua)
 
 ---
-## Installation 
+## Installation
 
-**READ ALL**
-
-Works for Arch, CachyOS, EndeavourOS, Manjaro, etc. 
-
-This is mainly intended for a clean installation (existing configuration files that are being replaced will be backed up automatically).
-
-**First install git then use the next command and continue the installation until it's finished**
+Works for Arch, CachyOS, EndeavourOS, Manjaro, etc. Mainly intended for a clean installation; existing configuration files that are replaced are backed up automatically.
 
 ```bash
-sudo pacman -S git   
-```
-
-```bash
-git clone https://github.com/43PR/dotfiles.git
+sudo pacman -S git
+git clone <URL of this repository> dotfiles
 cd dotfiles
 chmod +x install.sh
 ./install.sh
 ```
 
-After the installation finishes log out and back in.
+Then log out and back in. The installer also masks `mako.service` so quickshell owns notifications.
 
-It will show an empty desktop, dowload and move wallpapers to Pictures/Wallpapers, then you can use the wallpaper picker with: Super + W.
+1. **Wallpapers** — the desktop starts empty. Put images in `~/Pictures/Wallpapers` and open the wallpaper picker with `Super + W`.
+2. **Turn on wallpaper colors** — `theme.py colorgen on` (it is off by default), then pick a wallpaper. Or use a preset with `theme.py preset <name>`.
+3. **Hardware-specific config** — `.config/hypr/monitors.lua` is for a 3-monitor setup (two landscape, one rotated) and some GPU/driver bits are Nvidia-specific. Edit these for your machine before first login.
 
 > [!important]
-> **Do not move or delete the dotfiles repository after installation.**
->
-> This setup uses **symbolic links (symlinks)** that point to files inside the cloned repository. If you move or delete the repository, those symlinks will break.
->
-> If you relocate the repository, simply run:
->
-> ```bash
-> ./install.sh
-> ```
->
-> The installer will automatically update the existing symlinks to point to the new location.
+> **Do not move or delete the dotfiles repository after installation.** The setup uses symlinks into the cloned repo. If you relocate it, run `./install.sh` again and the links are updated.
 
----
-## Updating
+> [!note]
+> Quickshell does not live-reload these symlinked files. After editing a `.qml` file, restart it: `qs kill; qs` (or `./update.sh --restart-shell`). If `qs kill` leaves a stuck instance, `pkill qs` first.
 
-If you didn't move the repository/dotfiles folder then run:
+### Updating
 
 ```bash
 cd dotfiles
@@ -125,26 +143,17 @@ git pull
 ./update.sh
 ```
 
-Other options: `--dry-run` (preview changes), `--skip-packages`, `--skip-theme`.
+Options: `--dry-run`, `--skip-packages`, `--skip-theme`, `--restart-shell`.
 
-Dotfiles are symlinked so, `git pull` updates your live configs directly.
+All programs: [packages.txt](packages.txt)
 
-You can check the reminders printed at the end of the run.
+---
+## Credits & License
 
-> [!tip]
-> If any Quickshell (`.qml`) files changed in the pull, run:
->
-> ```bash
-> ./update.sh --restart-shell
-> ```
->
-> to restart Quickshell automatically.
+- **[43PR/dotfiles](https://github.com/43PR/dotfiles)** — upstream. The base Hyprland configuration, Quickshell shell (bar, settings, power menu, notes, notifications), `theme.py` theme engine, installer and updater are 43PR's. Wallpapers: <https://wallhaven.cc/user/43pr>.
+- **[hyprquickpaper](https://github.com/iamsurjog/hyprquickpaper)** — the wallpaper picker, tweaked by upstream.
+- **[Matugen](https://github.com/InioX/matugen)** — Material-You color generation.
+- **Spicetify "text" theme** by darkthemer, modified by upstream.
+- Visual direction inspired by the [dusky](https://github.com/dusklinux/dusky) dotfiles. Nothing was copied from it; the pills, rofi theme and templates here are written for this setup.
 
-> [!note]
-> 
-> Custom-gpu parts are specific to my hardware.
->
-> For issues with the wallpaper picker, you can clear the cache from the Storage page in Settings.
-
-
-
+Released under the **MIT License** (see [LICENSE](LICENSE)), the same license as upstream; the original copyright notice is kept as required. Changes in this fork are released under the same terms.
