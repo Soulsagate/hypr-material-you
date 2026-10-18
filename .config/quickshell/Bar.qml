@@ -308,7 +308,7 @@ Scope {
         visible: lane ? (root.vertical ? lane.implicitHeight : lane.implicitWidth) > 0 : false
         width: root.vertical ? root.panelThick : (lane ? lane.implicitWidth + 4 : 0)
         height: root.vertical ? (lane ? lane.implicitHeight + 4 : 0) : root.panelThick
-        radius: root.barRadius
+        radius: root.joined ? root.barRadius : Math.min(width, height) / 2
         color: root.joined ? "transparent" : root.bgColor
         border.width: cfg.border && !root.joined ? 1 : 0
         border.color: root.borderColor
