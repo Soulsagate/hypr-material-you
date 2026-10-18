@@ -67,6 +67,8 @@ Scope {
     readonly property real barRadius: cfg.style === "strip" ? 0 : Theme.radius
     readonly property color bgColor: Qt.alpha(Theme.bg, cfg.bgOpacity)
     readonly property color borderColor: Qt.alpha(Theme.accent, 0.25)
+    readonly property color panelColor: Qt.alpha(Qt.tint(Theme._bgBase, Qt.alpha(Theme.accent, 0.14)), 0.72 * cfg.bgOpacity)
+    readonly property color panelBorder: Qt.alpha(Theme.accent, 0.22)
 
     function s(n) { return Math.round(n * cfg.scale); }
 
@@ -132,6 +134,10 @@ Scope {
         const miss = moduleIds.filter(x => startList.indexOf(x) < 0 && centerList.indexOf(x) < 0 && a.indexOf(x) < 0);
         return a.concat(miss);
     }
+
+    readonly property var endTailIds: ["notif", "wall", "settings", "power"]
+    readonly property var endTail: vertical ? [] : endList.filter(x => endTailIds.indexOf(x) >= 0)
+    readonly property var endHead: endList.filter(x => endTail.indexOf(x) < 0)
 
     function sectionOf(id) {
         if (startList.indexOf(id) >= 0) return "start";
@@ -309,9 +315,9 @@ Scope {
         width: root.vertical ? root.panelThick : (lane ? lane.implicitWidth + 4 : 0)
         height: root.vertical ? (lane ? lane.implicitHeight + 4 : 0) : root.panelThick
         radius: root.joined ? root.barRadius : Math.min(width, height) / 2
-        color: root.joined ? "transparent" : root.bgColor
-        border.width: cfg.border && !root.joined ? 1 : 0
-        border.color: root.borderColor
+        color: root.joined ? "transparent" : root.panelColor
+        border.width: root.joined ? 0 : 1
+        border.color: cfg.border ? root.borderColor : root.panelBorder
     }
 
     component Mod: Item {
@@ -1214,8 +1220,26 @@ Scope {
                 }
 
                 Panel {
+                    id: endTailPanel
+                    lane: endTailLane
+                    anchors.right: frame.right
+                    anchors.top: frame.top
+
+                    Lane {
+                        id: endTailLane
+                        anchors.centerIn: parent
+
+                        Repeater {
+                            model: root.endTail
+                            delegate: Slot {}
+                        }
+                    }
+                }
+
+                Panel {
                     lane: endLane
-                    anchors.right: root.vertical ? undefined : frame.right
+                    anchors.right: root.vertical ? undefined : (endTailPanel.visible ? endTailPanel.left : frame.right)
+                    anchors.rightMargin: endTailPanel.visible ? root.effGap : 0
                     anchors.bottom: root.vertical ? frame.bottom : undefined
                     anchors.top: root.vertical ? undefined : frame.top
                     anchors.left: root.vertical ? frame.left : undefined
@@ -1225,7 +1249,7 @@ Scope {
                         anchors.centerIn: parent
 
                         Repeater {
-                            model: root.endList
+                            model: root.endHead
                             delegate: Slot {}
                         }
                     }
