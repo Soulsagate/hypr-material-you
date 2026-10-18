@@ -37,10 +37,15 @@ All colors above were generated from the wallpaper. Change the wallpaper and eve
 - **Capsule pills** — the floating bar's panels are true capsules (`radius = min(width, height) / 2`) with an accent-tinted, semi-transparent background and a 1px accent hairline border. The existing bar-opacity slider still scales them. The `joined` and `strip` bar styles are unchanged.
 - **Right-pill split** — the right side of a horizontal bar is two pills instead of one: *media · volume · battery · net* and *notifications · wallpapers · settings · power*. It splits by module id, so the drag-to-reorder settings still work. Vertical bars keep a single panel.
 - **Taskbar module** — a new bar module (`Taskbar` in the bar settings, on by default) in its own pill next to the workspaces:
-  - one icon per open window, live from quickshell's `Hyprland.toplevels`, using each app's real icon from its desktop entry (glyph fallback when none resolves);
+  - one icon per open application window, live from quickshell's `Hyprland.toplevels`, using each app's real icon from its desktop entry;
+  - helper and utility surfaces (Steam's `steamwebhelper`, input-method/IME popups) and windows with no class, title or resolvable icon are skipped;
   - the focused window is highlighted;
   - click focuses the window and jumps to its workspace;
   - hover shows `<app name> · workspace <n>`.
+- **Media widget** — the now-playing module in the right pill:
+  - stays visible while paused, so you can resume from it. Before, an idle player with no track (a Chromium-based app reporting `Stopped`) could be picked when nothing was playing and hide the widget; now it sticks to the player that last played, then any player with a track, and hides only when no player has one;
+  - the glyph shows ⏸ while playing and ▶ while paused; click the title to toggle play/pause;
+  - new ⏮ previous / ⏭ next buttons on either side call MPRIS `previous()` / `next()` on the active player (dimmed when the player can't skip). Right-click and middle-click on the title still skip forward and back.
 - **Rofi theme** — rounded 24px window, capsule search bar, 36px icons, app descriptions under each name, a single highlighted row, JetBrainsMono Nerd Font. It reads the generated `colors.rasi`, so it follows the wallpaper.
 - **Hyprland look** (`.config/hypr/look.lua`) — 1px gradient border from the matugen accent, rounding 14, gaps 6 in / 12 out, blur (size 8, 3 passes, noise), soft shadow, and Material-3 style animations (`md3_decel` / `md3_accel` curves, popin windows, layer animations for rofi and bar popups).
 
@@ -98,13 +103,13 @@ theme.py status                 # current mode / preset / wallpaper
 | `Super + W`             | Wallpaper selector        |
 | `Super + O`             | Switch opacity            |
 | `Super + Tab`           | Lock screen               |
-| `Super + Grave`         | Logout menu               |
+| `Super + Escape`        | Power/logout menu         |
 | `Super + Shift + W`     | Toggle bar                |
 | `Super + Mouse wheel`   | Zoom in/out               |
 | `Super + C`             | Notes/To-do               |
 | `Super + N`             | Notifications             |
-| `Delete`                | Screenshot fullscreen     |
-| `SHIFT + Delete`        | Screenshot area select    |
+| `Super + Delete`        | Screenshot fullscreen     |
+| `Super + Shift + S`     | Screenshot area select    |
 
 > **Move and resize windows with Super + left/right mouse drag.**
 >
