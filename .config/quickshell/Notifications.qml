@@ -363,7 +363,7 @@ PanelWindow {
                 }
 
                 Timer {
-                    interval: wrapper.modelData.expireTimeout > 0 ? wrapper.modelData.expireTimeout * 1000 : 6000
+                    interval: wrapper.modelData.expireTimeout > 0 ? Math.min(wrapper.modelData.expireTimeout > 100 ? wrapper.modelData.expireTimeout : wrapper.modelData.expireTimeout * 1000, 10000) : 6000
                     running: !wrapper.critical && !hover.containsMouse && !wrapper.leaving
                     onTriggered: wrapper.close(true)
                 }

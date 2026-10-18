@@ -1,46 +1,24 @@
--- MONITORS.LUA
--- https://wiki.hypr.land/Configuring/Monitors/
--- Find your monitor names with:
---   hyprctl monitors
+-- Monitor layout: DP-1 (LG) left, DP-3 (ASUS) center, DP-2 (Blade panel) right vertical
 
--- 1. First monitor
--- hl.monitor({ output = "eDP-1", mode = "preferred", position = "auto", scale = 1 })
--- hl.monitor({ output = "HDMI-A-1", disabled = true })
-
--- 2. Second monitor
--- hl.monitor({ output = "eDP-1", disabled = true })
--- hl.monitor({ output = "HDMI-A-1", mode = "preferred", position = "auto", scale = 1 })
-
--- 3. Extend / Auto
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 }) 
-
--- 4. Duplicate
--- hl.monitor({ output = "eDP-1", mode = "preferred", position = "0x0", scale = 1 })
--- hl.monitor({ output = "HDMI-A-1", mode = "preferred", position = "0x0", scale = 1 })
-
--- 5. Second vertical monitor
--- hl.monitor({ output = "HDMI-A-1", mode = "preferred", position = "0x0", scale = 1 })
--- hl.monitor({ output = "eDP-1", mode = "preferred", position = "1920x0", scale = 1, transform = 1 })
-
-pcall(function()
-    local path = os.getenv("HOME") .. "/.config/quickshell/state/display.lua"
-    local f = io.open(path, "r")
-    if f then
-        f:close()
-        dofile(path)
-    end
-end)
-
--- WORKSPACE RULES
--- https://wiki.hypr.land/Configuring/Workspace-Rules/
-
--- hl.workspace_rule({ workspace = "name:gaming", monitor = PRIMARY_MONITOR, default = true })
-
-hl.workspace_rule({ workspace = "1", monitor = MONITOR1, default = true, persistent = true })
-hl.workspace_rule({ workspace = "2", monitor = MONITOR1, default = true, persistent = true })
-hl.workspace_rule({ workspace = "3", monitor = MONITOR1, default = true, persistent = true })
-hl.workspace_rule({ workspace = "4", monitor = MONITOR1, default = true, persistent = true })
-
--- hl.workspace_rule({ workspace = "5", monitor = MONITOR2, default = true, persistent = true })
--- hl.workspace_rule({ workspace = "6", monitor = MONITOR2, default = true, persistent = true })
-
+hl.monitor({
+    output = "DP-1",
+    mode = "1920x1080@143.98",
+    position = "0x0",
+    scale = 1.0,
+    vrr = 0
+})
+hl.monitor({
+    output = "DP-3",
+    mode = "1920x1080@239.76",
+    position = "1920x0",
+    scale = 1.0,
+    vrr = 0
+})
+hl.monitor({
+    output = "DP-2",
+    mode = "1920x1080@300.19",
+    position = "3840x0",
+    scale = 1,
+    vrr = 0,
+    transform = 3
+})

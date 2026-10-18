@@ -7,7 +7,7 @@ mainMod    = "SUPER"
 terminal   = "kitty"
 menu       = "rofi -show drun"
 fileManager = "thunar"
-browser    = "brave"
+browser    = "/usr/sbin/helium-browser"
 
 ---- AUTOSTART ----
 
@@ -32,9 +32,9 @@ hl.env("MOZ_ENABLE_WAYLAND", "1")
 
 hl.config({
     input = {
-        kb_layout = "us,latam",
+        kb_layout = "us",
         follow_mouse = 1,
-        sensitivity = 0.5,
+        sensitivity = 0,
         touchpad = {
             natural_scroll = false,
             tap_to_click = true,
@@ -67,3 +67,7 @@ require("rules")
 
 -- HyprMod managed settings
 require("hyprland-gui")
+
+---- NVIDIA ----
+hl.env("LIBVA_DRIVER_NAME", "nvidia")
+hl.env("__GLX_VENDOR_LIBRARY_NAME", "nvidia")

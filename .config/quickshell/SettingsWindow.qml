@@ -8,6 +8,7 @@ import "SettingsPages"
 
 PanelWindow {
     id: root
+    screen: Quickshell.screens.find(function (s) { return s.name === "DP-3" }) || Quickshell.screens[0]
     anchors { top: true; left: true; right: true; bottom: true }
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
