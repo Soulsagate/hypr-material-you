@@ -7,16 +7,26 @@ import Quickshell.Services.Mpris
 Scope {
     id: root
 
+    // The player that last played, so the widget sticks to it when paused
+    property var lastPlayer: null
+
+    // A playing player wins; otherwise keep the one that last played, then any
+    // player that actually has a track. Idle players with no track (e.g. a
+    // browser that reports "Stopped") never take the widget over.
     readonly property var player: {
         const ps = Mpris.players.values;
-        return ps.find(p => p.isPlaying) ?? ps[0] ?? null;
+        const playing = ps.find(p => p.isPlaying);
+        if (playing) return playing;
+        if (lastPlayer && ps.indexOf(lastPlayer) >= 0 && lastPlayer.trackTitle) return lastPlayer;
+        return ps.find(p => p.trackTitle) ?? null;
     }
     readonly property bool playing: player !== null && player.isPlaying
+    onPlayingChanged: if (playing) lastPlayer = player
     readonly property string title: player
         ? ((player.trackArtist ? player.trackArtist + " - " : "") + player.trackTitle)
         : ""
-    // nf-md play / pause
-    readonly property string text: (playing ? "\uDB81\uDC0A " : "\uDB80\uDFE4 ") + title
+    // nf-md pause (while playing) / play (while paused)
+    readonly property string text: (playing ? "\uDB80\uDFE4 " : "\uDB81\uDC0A ") + title
 
     readonly property int maxW: 150       // visible width in px
     readonly property int gap: 20         // gap between the two copies
