@@ -174,11 +174,37 @@ Scope {
         else cfg.endMods = a.join(",");
     }
 
+    // Taskbar: only real application windows. Helper/utility surfaces (Steam's
+    // webhelper, input-method popups) and toplevels with no class, title or
+    // resolvable icon are skipped.
+    readonly property var taskIgnoreClasses: ["steamwebhelper", "fcitx", "ibus", "input-method", "inputmethod", "xwaylandvideobridge"]
+
+    function taskClass(t) {
+        return t.lastIpcObject.class || (t.wayland ? t.wayland.appId : "") || "";
+    }
+    function taskEntry(cls) {
+        DesktopEntries.applications.values;   // re-evaluate once entries finish loading
+        if (cls === "") return null;
+        return DesktopEntries.heuristicLookup(cls) ?? DesktopEntries.heuristicLookup(cls.toLowerCase());
+    }
+    function taskIcon(cls) {
+        const e = taskEntry(cls);
+        return cls === "" ? "" : Quickshell.iconPath(e ? e.icon : cls.toLowerCase(), true);
+    }
+    function isTaskWindow(t) {
+        const cls = taskClass(t);
+        const title = t.title || t.lastIpcObject.title || "";
+        if (cls === "" || title === "") return false;
+        const lc = cls.toLowerCase();
+        if (taskIgnoreClasses.some(x => lc.indexOf(x) >= 0)) return false;
+        return taskIcon(cls) !== "";
+    }
+
     function modVisible(id) {
         switch (id) {
         case "stats": return cfg.showStats && !vertical;
         case "ws": return cfg.showWs;
-        case "tasks": return cfg.showTasks && Hyprland.toplevels.values.length > 0;
+        case "tasks": return cfg.showTasks && Hyprland.toplevels.values.some(t => isTaskWindow(t));
         case "media": return cfg.showMedia && Marquee.player !== null && Marquee.title !== "";
         case "volume": return cfg.showVolume;
         case "battery": return cfg.showBattery && battery !== null;
@@ -590,22 +616,23 @@ Scope {
             implicitWidth: taskLane.implicitWidth + (root.vertical ? 0 : 12)
             implicitHeight: taskLane.implicitHeight + (root.vertical ? 12 : 0)
 
+            ScriptModel {
+                id: taskModel
+                values: Hyprland.toplevels.values.filter(t => root.isTaskWindow(t))
+            }
+
             Lane {
                 id: taskLane
                 anchors.centerIn: parent
                 gap: 4
 
                 Repeater {
-                    model: Hyprland.toplevels
+                    model: taskModel
                     delegate: Rectangle {
                         id: task
                         required property var modelData
-                        readonly property string cls: modelData.lastIpcObject.class || (modelData.wayland ? modelData.wayland.appId : "")
-                        readonly property var entry: {
-                            DesktopEntries.applications.values;   // re-evaluate once entries finish loading
-                            if (cls === "") return null;
-                            return DesktopEntries.heuristicLookup(cls) ?? DesktopEntries.heuristicLookup(cls.toLowerCase());
-                        }
+                        readonly property string cls: root.taskClass(modelData)
+                        readonly property var entry: root.taskEntry(cls)
                         readonly property string appName: entry ? entry.name : (cls !== "" ? cls : modelData.title)
                         readonly property string wsName: modelData.workspace ? modelData.workspace.name : "?"
                         readonly property bool focused: Hyprland.activeToplevel !== null && Hyprland.activeToplevel.address === modelData.address
@@ -622,26 +649,13 @@ Scope {
 
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
-                        readonly property string iconSrc: Quickshell.iconPath(entry ? entry.icon : cls.toLowerCase(), true)
-
                         Image {
                             anchors.centerIn: parent
                             width: 16; height: 16
                             sourceSize: Qt.size(32, 32)
                             smooth: true
-                            visible: task.iconSrc !== ""
                             opacity: task.focused ? 1.0 : 0.75
-                            source: task.iconSrc
-                        }
-
-                        Text {
-                            anchors.centerIn: parent
-                            visible: task.iconSrc === ""
-                            text: "\uf2d0"
-                            color: Theme.text
-                            opacity: task.focused ? 1.0 : 0.75
-                            font.family: Theme.iconFont
-                            font.pixelSize: 13
+                            source: root.taskIcon(task.cls)
                         }
 
                         MouseArea {
