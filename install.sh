@@ -372,6 +372,25 @@ if command -v systemctl >/dev/null 2>&1; then
 fi
 
 # --------------------------------------------------
+# Notification daemon: quickshell owns org.freedesktop.Notifications
+# --------------------------------------------------
+# mako ships a D-Bus activation file, so any notification sent while
+# quickshell is not running (login, a bar reload) would auto-start mako,
+# which then keeps the name and blocks quickshell's built-in server.
+# Masking the unit stops that activation permanently.
+
+if command -v systemctl >/dev/null 2>&1; then
+    info "Masking mako so it cannot steal the notification service from quickshell..."
+    systemctl --user stop mako.service >/dev/null 2>&1 || true
+
+    if systemctl --user mask mako.service >/dev/null 2>&1; then
+        success "mako.service masked."
+    else
+        warning "Could not mask mako.service. If notifications look wrong, run: systemctl --user mask mako.service"
+    fi
+fi
+
+# --------------------------------------------------
 # Permissions
 # --------------------------------------------------
 #
