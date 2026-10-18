@@ -1,0 +1,46 @@
+── APPS ──
+Super+T                  Terminal
+Super+D                  App launcher
+Super+S                  Wheel launcher
+Super+B                  Browser
+Super+E                  File manager
+Super+I                  Settings
+Super+W                  Wallpaper picker
+Super+V                  Clipboard history
+Super+C                  Notes / to-do
+Super+N                  Notifications
+Super+/                  This cheat sheet
+── WINDOWS ──
+Super+Q                  Close window
+Super+F                  Fullscreen
+Super+Space              Float window (centred)
+Super+H/J/K/L            Focus left/down/up/right
+Super+Shift+H/J/K/L      Move window
+Super+Ctrl+H/J/K/L       Resize window
+Super+left drag          Move window with mouse
+Super+right drag         Resize window with mouse
+── WORKSPACES ──
+Super+1..0               Switch to workspace 1-10
+Super+Shift+1..0         Send window to workspace
+── LOOK ──
+Super+O                  Window opacity
+Super+Shift+T            Light/dark theme
+Super+Shift+W            Show/hide bar
+Super+mouse wheel        Zoom
+── SCREENSHOTS / RECORDING ──
+Super+Delete             Screenshot everything
+Super+Shift+S            Screenshot selected area
+Super+R                  Start/stop recording the focused monitor
+── INPUT ──
+Super+X                  Next keyboard layout
+── SESSION ──
+Super+Tab                Lock screen
+Super+Esc                Power menu
+Super+Shift+E            Quit Hyprland (no confirm)
+── TERMINAL ──
+theme toggle             Light/dark from terminal
+lt                       Folder tree
+fastfetch                System info
+cava                     Audio visualiser
+btop / nvtop             System / GPU monitor
+cmatrix                  Matrix rain
