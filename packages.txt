@@ -141,7 +141,6 @@ cmatrix
 # --------------------------------------------------
 
 ttf-jetbrains-mono-nerd
-ttf-iosevka-nerd
 ttf-roboto-mono
 otf-font-awesome
 
