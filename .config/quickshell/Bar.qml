@@ -706,17 +706,71 @@ Scope {
     Component {
         id: mediaC
         Item {
-            implicitWidth: root.vertical ? vMedia.implicitWidth : Math.min(Marquee.textW, Marquee.maxW) + 20
+            readonly property int skipW: 16
+            readonly property int skipPad: 6
+            implicitWidth: root.vertical ? vMedia.implicitWidth : Math.min(Marquee.textW, Marquee.maxW) + 2 * (skipW + skipPad + 2)
             implicitHeight: root.vertical ? vMedia.implicitHeight : 18
 
             Item {
                 visible: !root.vertical
                 anchors.fill: parent
 
+                Text {
+                    id: prevBtn
+                    anchors.left: parent.left
+                    anchors.leftMargin: skipPad
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: root.iconYOffset
+                    width: skipW
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "\uDB81\uDCAE"   // nf-md skip-previous
+                    color: prevMa.containsMouse ? Theme.accent : Theme.text
+                    opacity: Marquee.player && Marquee.player.canGoPrevious ? 1.0 : 0.35
+                    font.family: Theme.iconFont
+                    font.pixelSize: root.sizeMarquee + 3
+                    renderType: Text.NativeRendering
+
+                    MouseArea {
+                        id: prevMa
+                        anchors.fill: parent
+                        anchors.margins: -3
+                        hoverEnabled: true
+                        onClicked: if (Marquee.player && Marquee.player.canGoPrevious) Marquee.player.previous()
+                    }
+                }
+
+                Text {
+                    id: nextBtn
+                    anchors.right: parent.right
+                    anchors.rightMargin: skipPad
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: root.iconYOffset
+                    width: skipW
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "\uDB81\uDCAD"   // nf-md skip-next
+                    color: nextMa.containsMouse ? Theme.accent : Theme.text
+                    opacity: Marquee.player && Marquee.player.canGoNext ? 1.0 : 0.35
+                    font.family: Theme.iconFont
+                    font.pixelSize: root.sizeMarquee + 3
+                    renderType: Text.NativeRendering
+
+                    MouseArea {
+                        id: nextMa
+                        anchors.fill: parent
+                        anchors.margins: -3
+                        hoverEnabled: true
+                        onClicked: if (Marquee.player && Marquee.player.canGoNext) Marquee.player.next()
+                    }
+                }
+
                 Item {
-                    anchors.fill: parent
-                    anchors.leftMargin: 10
-                    anchors.rightMargin: 10
+                    id: marqueeClip
+                    anchors.left: prevBtn.right
+                    anchors.right: nextBtn.left
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.leftMargin: 2
+                    anchors.rightMargin: 2
                     clip: true
 
                     Row {
@@ -748,7 +802,7 @@ Scope {
                 }
 
                 MouseArea {
-                    anchors.fill: parent
+                    anchors.fill: marqueeClip
                     acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
                     onClicked: mouse => {
                         const p = Marquee.player;
