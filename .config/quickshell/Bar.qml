@@ -29,6 +29,7 @@ Scope {
             property bool border: false
             property bool showStats: true
             property bool showWs: true
+            property bool showTasks: true
             property bool showMedia: true
             property bool showVolume: true
             property bool showBattery: true
@@ -51,7 +52,7 @@ Scope {
     function resetSettings() {
         cfg.position = "top"; cfg.style = "joined"; cfg.thickness = 20; cfg.margin = 4;
         cfg.scale = 1.0; cfg.bgOpacity = 0.7; cfg.border = false;
-        cfg.showStats = false; cfg.showWs = true; cfg.showMedia = true;
+        cfg.showStats = false; cfg.showWs = true; cfg.showTasks = true; cfg.showMedia = true;
         cfg.showVolume = true; cfg.showBattery = true; cfg.showNet = true;
         cfg.showNotif = true; cfg.showWall = true; cfg.showSettings = true;
         cfg.startMods = "stats,ws";
@@ -105,10 +106,11 @@ Scope {
     readonly property var batIcons: ["\uf244", "\uf243", "\uf242", "\uf241", "\uf240"]
     readonly property string batIcon: batIcons[batPct >= 90 ? 4 : batPct >= 65 ? 3 : batPct >= 40 ? 2 : batPct >= 15 ? 1 : 0]
 
-    readonly property var moduleIds: ["stats", "ws", "media", "volume", "battery", "net", "notif", "wall", "settings", "power"]
+    readonly property var moduleIds: ["stats", "ws", "tasks", "media", "volume", "battery", "net", "notif", "wall", "settings", "power"]
     readonly property var moduleDefs: [
         { id: "stats", l: "CPU / RAM (x)", k: "showStats" },
         { id: "ws", l: "Workspaces", k: "showWs" },
+        { id: "tasks", l: "Taskbar", k: "showTasks" },
         { id: "media", l: "Media", k: "showMedia" },
         { id: "volume", l: "Volume", k: "showVolume" },
         { id: "battery", l: "Battery", k: "showBattery" },
@@ -119,8 +121,9 @@ Scope {
         { id: "power", l: "Power", k: "" }
     ]
 
-    readonly property var startList: cfg.startMods === "" ? []
-        : cfg.startMods.split(",").filter(x => moduleIds.indexOf(x) >= 0)
+    readonly property bool tasksPlaced: [cfg.startMods, cfg.centerMods, cfg.endMods].some(m => m.split(",").indexOf("tasks") >= 0)
+    readonly property var startList: (cfg.startMods === "" ? []
+        : cfg.startMods.split(",").filter(x => moduleIds.indexOf(x) >= 0)).concat(tasksPlaced ? [] : ["tasks"])
 
     readonly property var centerList: {
         const a = cfg.centerMods === "" ? []
@@ -135,6 +138,8 @@ Scope {
         return a.concat(miss);
     }
 
+    readonly property var startTail: vertical ? [] : startList.filter(x => x === "tasks")
+    readonly property var startHead: startList.filter(x => startTail.indexOf(x) < 0)
     readonly property var endTailIds: ["notif", "wall", "settings", "power"]
     readonly property var endTail: vertical ? [] : endList.filter(x => endTailIds.indexOf(x) >= 0)
     readonly property var endHead: endList.filter(x => endTail.indexOf(x) < 0)
@@ -173,6 +178,7 @@ Scope {
         switch (id) {
         case "stats": return cfg.showStats && !vertical;
         case "ws": return cfg.showWs;
+        case "tasks": return cfg.showTasks && Hyprland.toplevels.values.length > 0;
         case "media": return cfg.showMedia && Marquee.player !== null && Marquee.title !== "";
         case "volume": return cfg.showVolume;
         case "battery": return cfg.showBattery && battery !== null;
@@ -188,6 +194,7 @@ Scope {
         switch (id) {
         case "stats": return statsC;
         case "ws": return wsC;
+        case "tasks": return tasksC;
         case "media": return mediaC;
         case "volume": return volumeC;
         case "battery": return batteryC;
@@ -573,6 +580,98 @@ Scope {
                 onWheel: e => root.run(e.angleDelta.y > 0
                     ? "hyprctl dispatch 'hl.dsp.focus({workspace=\"e+1\"})'"
                     : "hyprctl dispatch 'hl.dsp.focus({workspace=\"e-1\"})'")
+            }
+        }
+    }
+
+    Component {
+        id: tasksC
+        Item {
+            implicitWidth: taskLane.implicitWidth + (root.vertical ? 0 : 12)
+            implicitHeight: taskLane.implicitHeight + (root.vertical ? 12 : 0)
+
+            Lane {
+                id: taskLane
+                anchors.centerIn: parent
+                gap: 4
+
+                Repeater {
+                    model: Hyprland.toplevels
+                    delegate: Rectangle {
+                        id: task
+                        required property var modelData
+                        readonly property string cls: modelData.lastIpcObject.class || (modelData.wayland ? modelData.wayland.appId : "")
+                        readonly property var entry: {
+                            DesktopEntries.applications.values;   // re-evaluate once entries finish loading
+                            if (cls === "") return null;
+                            return DesktopEntries.heuristicLookup(cls) ?? DesktopEntries.heuristicLookup(cls.toLowerCase());
+                        }
+                        readonly property string appName: entry ? entry.name : (cls !== "" ? cls : modelData.title)
+                        readonly property string wsName: modelData.workspace ? modelData.workspace.name : "?"
+                        readonly property bool focused: Hyprland.activeToplevel !== null && Hyprland.activeToplevel.address === modelData.address
+
+                        Layout.alignment: Qt.AlignCenter
+                        implicitWidth: 22
+                        implicitHeight: 22
+                        radius: 11
+                        color: focused ? Qt.alpha(Theme.accent, 0.28)
+                             : taskMa.containsMouse ? Qt.alpha(Theme.accent, 0.14)
+                             : "transparent"
+                        border.width: focused ? 1 : 0
+                        border.color: Qt.alpha(Theme.accent, 0.6)
+
+                        Behavior on color { ColorAnimation { duration: Theme.animFast } }
+
+                        Image {
+                            anchors.centerIn: parent
+                            width: 16; height: 16
+                            sourceSize: Qt.size(32, 32)
+                            smooth: true
+                            opacity: task.focused ? 1.0 : 0.75
+                            source: Quickshell.iconPath(task.entry ? task.entry.icon : task.cls.toLowerCase(), "application-x-executable")
+                        }
+
+                        MouseArea {
+                            id: taskMa
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: root.run("hyprctl dispatch 'hl.dsp.focus({window=\"address:0x" + task.modelData.address + "\"})'")
+                        }
+
+                        LazyLoader {
+                            active: taskMa.containsMouse
+
+                            PopupWindow {
+                                anchor.item: task
+                                anchor.edges: root.vertical ? (cfg.position === "left" ? Edges.Right : Edges.Left)
+                                                            : (cfg.position === "top" ? Edges.Bottom : Edges.Top)
+                                anchor.gravity: anchor.edges
+                                anchor.margins.top: 6
+                                implicitWidth: tipText.implicitWidth + 24
+                                implicitHeight: tipText.implicitHeight + 14
+                                color: "transparent"
+                                visible: true
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: height / 2
+                                    color: root.panelColor
+                                    border.width: 1
+                                    border.color: root.panelBorder
+
+                                    Text {
+                                        id: tipText
+                                        anchors.centerIn: parent
+                                        text: task.appName + "  ·  workspace " + task.wsName
+                                        color: Theme.text
+                                        font.family: Theme.iconFont
+                                        font.pixelSize: 11
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -964,6 +1063,7 @@ Scope {
                 }
 
                 Panel {
+                    id: startPanel
                     lane: startLane
                     anchors.left: frame.left
                     anchors.top: frame.top
@@ -973,7 +1073,24 @@ Scope {
                         anchors.centerIn: parent
 
                         Repeater {
-                            model: root.startList
+                            model: root.startHead
+                            delegate: Slot {}
+                        }
+                    }
+                }
+
+                Panel {
+                    lane: startTailLane
+                    anchors.left: startPanel.visible ? startPanel.right : frame.left
+                    anchors.leftMargin: startPanel.visible ? root.effGap : 0
+                    anchors.top: frame.top
+
+                    Lane {
+                        id: startTailLane
+                        anchors.centerIn: parent
+
+                        Repeater {
+                            model: root.startTail
                             delegate: Slot {}
                         }
                     }
