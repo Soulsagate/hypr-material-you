@@ -73,10 +73,14 @@ hl.bind(mainMod .. " + Space", function()
     end
 end)
 
--- Gpu screen recorder
-hl.bind(mainMod .. " + R", hl.dsp.exec_cmd(
-    "bash -c 'PIDFILE=/tmp/osu-gsr.pid; if [ -f \"$PIDFILE\" ] && kill -0 \"$(cat \"$PIDFILE\")\" 2>/dev/null; then kill -INT \"$(cat \"$PIDFILE\")\"; rm -f \"$PIDFILE\"; else mkdir -p ~/Videos; gpu-screen-recorder -w HDMI-A-1 -f 60 -a default_output -o ~/Videos/$(date +%Y-%m-%d_%H-%M-%S).mp4 & echo $! > \"$PIDFILE\"; fi'"
-))
+-- Gpu screen recorder (records the focused monitor; "screen" if none is reported)
+hl.bind(mainMod .. " + R", function()
+    local mon = hl.get_active_monitor()
+    local output = (mon ~= nil and mon.name) or "screen"
+    hl.dispatch(hl.dsp.exec_cmd(
+        "bash -c 'PIDFILE=/tmp/osu-gsr.pid; if [ -f \"$PIDFILE\" ] && kill -0 \"$(cat \"$PIDFILE\")\" 2>/dev/null; then kill -INT \"$(cat \"$PIDFILE\")\"; rm -f \"$PIDFILE\"; else mkdir -p ~/Videos; gpu-screen-recorder -w " .. output .. " -f 60 -a default_output -o ~/Videos/$(date +%Y-%m-%d_%H-%M-%S).mp4 & echo $! > \"$PIDFILE\"; fi'"
+    ))
+end)
 
 -- Zoom
 local function zoomfunction(value)
