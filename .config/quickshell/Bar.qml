@@ -622,13 +622,26 @@ Scope {
 
                         Behavior on color { ColorAnimation { duration: Theme.animFast } }
 
+                        readonly property string iconSrc: Quickshell.iconPath(entry ? entry.icon : cls.toLowerCase(), true)
+
                         Image {
                             anchors.centerIn: parent
                             width: 16; height: 16
                             sourceSize: Qt.size(32, 32)
                             smooth: true
+                            visible: task.iconSrc !== ""
                             opacity: task.focused ? 1.0 : 0.75
-                            source: Quickshell.iconPath(task.entry ? task.entry.icon : task.cls.toLowerCase(), "application-x-executable")
+                            source: task.iconSrc
+                        }
+
+                        Text {
+                            anchors.centerIn: parent
+                            visible: task.iconSrc === ""
+                            text: "\uf2d0"
+                            color: Theme.text
+                            opacity: task.focused ? 1.0 : 0.75
+                            font.family: Theme.iconFont
+                            font.pixelSize: 13
                         }
 
                         MouseArea {
