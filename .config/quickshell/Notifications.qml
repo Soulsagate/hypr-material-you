@@ -3,6 +3,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Notifications
 import Quickshell.Services.UPower
+import Quickshell.Hyprland
 import QtQuick
 
 PanelWindow {
@@ -187,10 +188,18 @@ PanelWindow {
         stateTimer.restart();
     }
 
+    function followFocusedMonitor() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr && scr.width >= scr.height) root.screen = scr
+        }
+    }
+
     IpcHandler {
         target: "notifications"
-        function toggle(): void { root.panelOpen = !root.panelOpen; }
-        function open(): void { root.panelOpen = true; }
+        function toggle(): void { root.followFocusedMonitor(); root.panelOpen = !root.panelOpen; }
+        function open(): void { root.followFocusedMonitor(); root.panelOpen = true; }
         function close(): void { root.panelOpen = false; }
         function clear(): void { root.clearHistory(); }
         function dnd(): void { root.toggleDnd(); }

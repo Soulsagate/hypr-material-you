@@ -2,6 +2,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Pipewire
+import Quickshell.Hyprland
 import QtQuick
 import QtQuick.Shapes
 import "SettingsPages"
@@ -19,9 +20,16 @@ PanelWindow {
         item: root.showing ? backdrop : null
     }
     property bool showing: false
-    function show()   { showing = true }
+    function followFocusedMonitor() {
+        var mon = Hyprland.focusedMonitor
+        if (mon) {
+            var scr = Quickshell.screens.find(function (s) { return s.name === mon.name })
+            if (scr && scr.width >= scr.height) root.screen = scr
+        }
+    }
+    function show()   { followFocusedMonitor(); showing = true }
     function hide()   { showing = false }
-    function toggle() { showing = !showing }
+    function toggle() { followFocusedMonitor(); showing = !showing }
     function nextPage() { selectedIndex = (selectedIndex + 1) % navItems.length }
     function prevPage() { selectedIndex = (selectedIndex - 1 + navItems.length) % navItems.length }
 
@@ -170,10 +178,12 @@ PanelWindow {
             root.hide()
         }
         function sound(): void {
+            root.followFocusedMonitor()
             root.selectedIndex = 1
             root.show()
         }
         function network(): void {
+            root.followFocusedMonitor()
             root.selectedIndex = 3
             root.show()
         }
