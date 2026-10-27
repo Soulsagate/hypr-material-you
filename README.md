@@ -12,7 +12,7 @@ A polished, wallpaper-driven **Material-You** Hyprland desktop: capsule-pill Qui
 
 </div>
 
-> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). Beyond that visual layer, the fork made only two keybind-related changes (the `Super + R` recorder fix and the `Super + /` cheat sheet) and restored the workspace rules in `monitors.lua`; window rules are untouched. A few settings already differed from upstream before the fork; both lists are under [Keybinds](#keybinds). See [Credits](#credits--license).
+> **This is a fork of [43PR/dotfiles](https://github.com/43PR/dotfiles)** (MIT). The base setup, Quickshell shell, settings app, theme engine, keybinds and installer are 43PR's work. This fork adds a visual layer on top, listed under [What's new](#whats-new-in-this-fork). Beyond that visual layer, the fork made only two keybind-related changes (the `Super + R` recorder fix and the `Super + /` cheat sheet) and set up a per-monitor workspace layout in `monitors.lua`; window rules are untouched. A few settings already differed from upstream before the fork; both lists are under [Keybinds](#keybinds). See [Credits](#credits--license).
 
 ## Screenshots
 
@@ -98,7 +98,7 @@ theme.py status                 # current mode / preset / wallpaper
 > - power menu on `Super + Escape` (upstream: `Super + Grave`);
 > - light/dark toggle on `Super + Shift + T` (upstream: `Super + L`);
 > - screenshots on `Super + Delete` and `Super + Shift + S` (upstream: `Delete` and `Shift + Delete`);
-> - a custom `monitors.lua` for this machine's three monitors. That rewrite had dropped the workspace rules; this fork restored them, so workspaces 1–4 are pinned and persistent on the main monitor (DP-3);
+> - a custom `monitors.lua` for this machine's three monitors with a per-monitor workspace layout: center (ASUS) gets 1–3, left (LG) gets 4–5, right (AU Optronics) gets 6–7. Rules are resolved by monitor description so they survive port changes;
 > - `rules.lua`: fullscreen windows use `opacity = "0.9 override"` (upstream: `1.0`).
 
 | Keybind                 | Action                    |
